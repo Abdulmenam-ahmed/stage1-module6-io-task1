@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class FileReader {
 
-    public Profile getDataFromFile(File file) throws Exception {
+    public Profile getDataFromFile(File file) throws IOException ,Exception {
     	BufferedReader inputStream= 
 			new BufferedReader (
 			new java.io.FileReader(file));
@@ -21,18 +21,25 @@ public class FileReader {
 			profile.setName(s.substring(cut+2));
 		}
 		else if (s.contains("Age")) {
+			try {
 		profile.setAge(Integer.parseInt(s.substring(cut+2)));
+			} catch (Exception ex) {
+				//
+			}
 		}
 		else if (s.contains("Email")) {
 		profile.setEmail(s.substring(cut+2));
 		}
 		else {
+			try {
 			profile.setPhone(Long.parseLong(s.substring(cut+2)));
+			} catch (Exception ex) {
+				//
+			}
 		}
 	
 	}
 	System.out.println(profile.getName());
-	String name= profile.getName();
 	System.out.println(profile.getAge());
 	System.out.println(profile.getEmail());
 	System.out.println(profile.getPhone());

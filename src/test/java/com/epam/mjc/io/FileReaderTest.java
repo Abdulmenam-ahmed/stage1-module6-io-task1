@@ -30,12 +30,12 @@ public class FileReaderTest {
     }
 
     @AfterClass
-    public static void clean() {
-        try {
+    public static void clean() throws IOException {
+       // try {
             Files.delete(TEST_FILE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+      //  } catch (IOException e) {
+      //      throw new RuntimeException(e);
+      //  }
     }
 
     @Test
@@ -51,17 +51,24 @@ public class FileReaderTest {
         Files.walk(sources)
                 .filter(Files::isRegularFile)
                 .filter(p -> p.toString().endsWith(".java"))
-                .forEach(this::assertSourceWithoutProhibitedLibraries);
+                .forEach(t -> {
+					try {
+						assertSourceWithoutProhibitedLibraries(t);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
     }
 
     @Test
-    public void testCodeHasStreamClosing() {
+    public void testCodeHasStreamClosing() throws Exception {
         String sourceCode = readFileIntoString(READER_CLASS);
         assertTrue("Code doesn't contain closing or try-with-resources",
                 sourceCode.contains("try (") || sourceCode.contains("try(") || sourceCode.contains(".close()"));
     }
 
-    private void assertSourceWithoutProhibitedLibraries(Path path) {
+    private void assertSourceWithoutProhibitedLibraries(Path path) throws Exception{
         String sourceCode = readFileIntoString(path);
         assertFalse("Code contains prohibited \"nio\" library", sourceCode.contains(".nio"));
         assertFalse("Code contains prohibited \"FileUtils\"", sourceCode.contains("FileUtils"));
@@ -72,7 +79,7 @@ public class FileReaderTest {
         assertFalse("Code contains prohibited \"com.google\"", sourceCode.contains("com.google"));
     }
 
-    private String readFileIntoString(Path sourcePath) {
+    private String readFileIntoString(Path sourcePath) throws Exception {
         try {
             return Files.readString(sourcePath);
         } catch (IOException e) {
@@ -80,7 +87,7 @@ public class FileReaderTest {
         }
     }
 
-    public static int getRandomInt(int min, int max) {
+    public static int getRandomInt(int min, int max) { 
         return (int) ((Math.random() * (max - min)) + min);
     }
 
