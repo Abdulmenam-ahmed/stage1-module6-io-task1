@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class FileReaderTest {
+public class FileReaderTest   {
 
     private final static Path TEST_FILE = Path.of("src/test/resources/test.txt");
     private final static Path READER_CLASS = Path.of("src/main/java/com/epam/mjc/io/FileReader.java");
@@ -22,7 +22,7 @@ public class FileReaderTest {
     private static Profile profile;
 
     @BeforeClass
-    public static void setup() {
+    public static void setup() throws IOException{
         String randomString = RandomStringUtils.randomAlphabetic(5);
         Integer randomInt = getRandomInt(1, 20);
         profile = new Profile(randomString, randomInt, randomString, randomInt.longValue());
@@ -30,7 +30,7 @@ public class FileReaderTest {
     }
 
     @AfterClass
-    public static void clean() throws IOException {
+    public static void clean() throws IOException  {
        // try {
             Files.delete(TEST_FILE);
       //  } catch (IOException e) {
@@ -54,7 +54,7 @@ public class FileReaderTest {
                 .forEach(t -> {
 					try {
 						assertSourceWithoutProhibitedLibraries(t);
-					} catch (Exception e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -62,13 +62,13 @@ public class FileReaderTest {
     }
 
     @Test
-    public void testCodeHasStreamClosing() throws Exception {
+    public void testCodeHasStreamClosing() throws IOException {
         String sourceCode = readFileIntoString(READER_CLASS);
         assertTrue("Code doesn't contain closing or try-with-resources",
                 sourceCode.contains("try (") || sourceCode.contains("try(") || sourceCode.contains(".close()"));
     }
 
-    private void assertSourceWithoutProhibitedLibraries(Path path) throws Exception{
+    private void assertSourceWithoutProhibitedLibraries(Path path) throws IOException{
         String sourceCode = readFileIntoString(path);
         assertFalse("Code contains prohibited \"nio\" library", sourceCode.contains(".nio"));
         assertFalse("Code contains prohibited \"FileUtils\"", sourceCode.contains("FileUtils"));
@@ -79,7 +79,7 @@ public class FileReaderTest {
         assertFalse("Code contains prohibited \"com.google\"", sourceCode.contains("com.google"));
     }
 
-    private String readFileIntoString(Path sourcePath) throws Exception {
+    private String readFileIntoString(Path sourcePath) throws IOException {
         try {
             return Files.readString(sourcePath);
         } catch (IOException e) {
